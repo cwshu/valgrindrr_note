@@ -1,0 +1,57 @@
+Valgrind 組成
+-------------
+VEX
+    - libvex_ir.h
+coregrind
+    - modules 
+        - m_scheduler
+        - m_translate
+        - m_syswrap
+        - m_tooliface
+        - m_libcxxx: glibc function 重製
+tools
+    - memcheck
+    - helgrind
+    - ...
+
+coding style and convention
+---------------------------
+- MACRO NAMESPACE 
+    - VG_(...) for global
+    - ML_(...) for module local
+- self defined type and basic glibc functions
+
+Misc
+----
+- valgrind is binary wrapper, every tools is an independent executable
+    - launcher-linux.c
+    - do something like setting environment variable
+
+- valgrind core and tools
+    - tool has 4 function link with coregrind + LibVEX
+        - pre_cli_init()
+        - post_cli_init()
+        - instrument()
+        - finalization()
+
+    - core main calling routine
+        - valgrind_main()
+            - initialization 1, 2
+        - VG_(main_thread_wrapper_NORETURN)
+        - ML_(call_on_new_stack_0_1)
+
+        - run_a_thread_NORETURN in coregrind/m_syswrap/syswrap-linux.c
+            - thread_wrapper
+                - VG_(scheduler)
+                    - handle_* calling VG_(translate). 
+        - VG_(address_of_m_main_shutdown_actions_NORETURN) = shutdown_actions_NORETURN  // function pointer
+        - shutdown_actions_NORETURN()
+          - finalization()
+
+- LibVEX_translate
+    - from target to IR
+    - IR instrumentation
+    - IR to target
+    - VG_(translate)
+        - the wrapper of LibVEX_translate(), coregrind code use VG_(translate)() to translation and instrumentation.
+        - instrumented target code store in translated table and translated cache

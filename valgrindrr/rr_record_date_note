@@ -1,0 +1,28 @@
+1. valgrind_main > VG_(am_startup) > record INITIMG_MEMLAYOUT
+2. valgrind_main > VG_(split_up_argv) > record CLIENT_CMDLINE
+3. valgrind_main (end) > VG_(main_thread_wrapper_NORETURN) > record THREAD_CREATE (main thread)
+4~n. RDTSC
+n+1. [client start] record system call
+
+Log Item
+--------
+
+LogEntry
+--------
+union 12 種, 只有 release_biglock 跟 all 是 16 byte, 其他都是 8 byte
+
+ref
+---
+01. SYSCALL_ARGS
+02. SYSCALL_RET
+03. SYSCALL_DISPATCH_CTR
+04. THREAD_CREATE
+05. ACQUIRE_BIGLOCK
+06. RELEASE_BIGLOCK
+07. RDTSC
+08. CLIENT_CMDLINE
+09. INITIMG_CLSTK
+10. INITIMG_MEMLAYOUT
+11. DATA2
+12. DATA1
+

@@ -1,0 +1,43 @@
+Usage
+-----
+tools link to core, provide some instrumentation function called by core.
+
+valgrind --tool='....'
+
+Build it
+--------
+The tool implements some functions, and they are linked and called by valgrind core.
+
+our valgrind tools name (rr, recordreplay)
+
+- add recordreplay/
+- add recordreplay/docs
+- add recordreplay/tests
+- add recordreplay/Makefile.am
+- add recordreplay/tests/Makefile.am
+- add recordreplay/rr_main.c
+- modify Makefile.am
+- modify configure.ac
+
+- recordreplay/Makefile.am
+    - cp none/Makefile recordreplay/Makefile.am
+    - replace (none, nl_, nl-) to (recordreplay, rr_, rr-)
+- recordreplay/rr_main.c
+    - cp none/nl_main.c recordreplay/rr_main.c
+    - four functions' prefix nl => rr
+        - function definition and function call by other
+    - VG_(detail_xxx): tool's infomation
+- Makefile.am
+    - TOOLS or EXP_TOOLS append recordreplay
+- configure.ac
+    - AC_CONFIG_FILES append recordreplay/Makefile and recordreplay/tests/Makefile
+
+Tool structure
+--------------
+- pre_clo_init()
+    - before input CLI option initialaztion
+- post_clo_init()
+    - after input CLI option initialaztion
+- instrument()
+- fini()
+    - output log

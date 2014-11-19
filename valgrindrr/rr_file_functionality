@@ -1,0 +1,72 @@
+record type
+-----------
+- argc, argv
+- syscall
+    - args
+    - return val, memory
+    - dispatch_ctr
+- thread
+    - create
+    - acquire_lock
+    - release_lock
+- x86 non-deterministic instruction - rdtsc
+- initimg_clstk
+- initimg_memlayout
+
+files
+-----
+coregrind/pub_core_basic.h: #define RECORD_REPLAY
+coregrind/pub_core_threadstate.h: ThreadState struct has new member dispatch_ctr(UInt)
+coregrind/pub_core_recordreplay.h: 
+
+VEX/pub/libvex.h: instrumention0 function
+VEX/priv/main/vex_main.c: instrumention0 function (VEX/priv/main_main.c in valgrind 3.9)
+coregrind/launcher-linux.c: add command line argument `--record-replay`
+coregrind/m_translate.c: vta.instrumention0 = VG_(instrumentRecordReplay)
+coregrind/m_commandline.c: VG_(RR_ClientCmdLine), ... etc.
+coregrind/m_main.c: 
+    - calling
+        - VG_(RR_Init)
+        - VG_(RR_Exit)
+
+m_recordreplay
+++++++++++++++
+coregrind/m_recordreplay/instrument.c
+    - VG_(instrumentRecordReplay) definition
+        - rr x86 RDTSC instruction
+coregrind/m_recordreplay/record.c
+    - ML_(writeToLog) implementation
+coregrind/m_recordreplay/replay.c
+    - ML_(readFromLog) implementation
+coregrind/m_recordreplay/priv_recordreplay.h
+    - Macro PROCESS_LOGENTRY
+        - ML_(writeToLog) at record time
+        - ML_(readFromLog) at replay time
+coregrind/m_recordreplay/recordreplay.c
+    - VG_(RR_Init)
+    - VG_(RR_Exit)
+
+m_syswrap
++++++++++
+coregrind/m_syswrap/syswrap-main.c
+    - should_not_record_replay
+    - VG_(client_syscall) 加入 record
+        - record syscall number, args
+        - record syscall result, replay syscall result
+    
+    - pre_handler
+        - get_syscall_entry
+        - syscall_table in syswrap-x86-linux.c, priv_types_n_macros.h
+    - do_syscall
+        - do_client_WRK
+            - push syscall args from VexGuestArchState to real cpu register
+            - run syscall
+            - push syscall result (x86's eax) to VexGuestArchState
+    - getSyscallStatusFromGuestState: SyscallStatus <-> VexGuestArchState 取 guest register value
+
+coregrind/m_syswrap/syswrap-generic.c
+coregrind/m_syswrap/syswrap-linux.c
+coregrind/m_syswrap/syswrap-x86-linux.c
+coregrind/m_syswrap/syswrapRR-generic.c
+coregrind/m_syswrap/syswrapRR-linux.c
+coregrind/m_syswrap/syswrapRR-x86-linux.c

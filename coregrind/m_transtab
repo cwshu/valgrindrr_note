@@ -1,0 +1,27 @@
+
+header file
+-----------
+- struct
+    - FastCacheEntry 
+        - Addr guest/host
+        - global array: VG_(tt_fast)[VG_TT_FAST_SIZE]
+    - SBProfEntry
+        - Addr64 addr, ULong score
+
+- functions
+    - VG_(init_tt_tc)
+    - VG_(add_to_transtab)
+    - VG_(search_transtab)
+    - VG_(add_to_unredir_transtab)
+    - VG_(search_unredir_transtab)
+
+    - VG_(tt_tc_do_chaining)
+    - VG_(discard_translations)
+    - VG_(print_tt_tc_stats)
+    - VG_(get_bbs_translated)
+
+    - VG_(get_SB_profile)
+
+c source
+--------
+TTEntry

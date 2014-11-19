@@ -1,0 +1,19 @@
+coregrind/m_syswrap
++++++++++++++++++++
+- syswrap-main.c
+- syswrap-generic.c (with RR version)
+    - 定義各 PRE(sys_<syscall_name>) and POST()
+    - [RR] 定義各 RECORDREPLAY(sys_<syscall_name>)
+- syswrap-<OS>.c (with RR version)
+    - OS: linux, darwin, xen
+- syswrap-<cpu>-<OS>.c (with RR version)
+    - cpu: x86, amd64, arm, mips32/64, ... etc 
+
+- priv_types_n_macros.h
+- priv_syswrap-main.h
+- priv_syswrap-generic.h
+- priv_syswrap-<OS>.h
+
+- syscall-<cpu>-<OS>.S
+    - ML_(do_syscall_for_client_WRK)
+

@@ -1,0 +1,58 @@
+LibVEX_translate
+----------------
+VexTranslateResult LibVEX_Translate(VexTranslateArgs*);
+
+function-related structure
+--------------------------
+- struct VexTranslateArgs
+    - struct VexGuestExtents (OUT: which bits of guest code actually got translated)
+        - base(Addr) + len + n_used
+
+    - dispatcher entry points 
+        - generated code should jump to at the end of each bb
+        - 每個 translation 的結尾(應該會 bb 結尾), next guest address 儲存在 host arch 負責 return address 的 register (ex. eax in x86)
+
+- struct VexTranslateResult
+
+LibVEX_translate function
++++++++++++++++++++++++++
+- VEX/priv/main_main.c
+    - LIBVEX_translate
+        - irsb = bb_to_IR(disInstrFn, vta->guest_bytes)
+            - 把 addr(instruction pointer) 轉成 irsb
+            - disInstrFn = disInstr_AMD64 (in amd64 platform)
+
+        - is calling iselSB_AMD64
+
+        - isel: irsb -> vcode
+        - register_allocation: vcode -> rcode
+        - emit: rcode -> insn_bytes
+        - insn_bytes is stored in vta->host_bytes (VexTranslateArgs)
+
+guide of 8 steps of LIBVEX_translate
+************************************
+1. Code Disassembly
+    - VEX/priv/guest_amd64_toIR.c
+        - disInstr_AMD64
+        - disInstr_AMD64_WRK
+        - disFPU
+        - disMMX
+    - VEX/pub/libvex_ir.h
+2. IR Optimization
+    - VEX/priv/ir_opt.c
+3. Instrumentation
+    - tools
+4. IR Optimization
+    - LibVEX_Translate
+5. Tree Building
+    - VEX/priv/ir_opt.c
+6. Instruction Selection
+    - VEX/priv/host_amd64_isel.c
+        - HInstrArray* iselSB_AMD64 ( IRSB* bb, ... )
+        - static void iselStmt ( ISelEnv* env, IRStmt* stmt )
+7. Register Allocation
+    - VEX/priv/host_generic_reg_alloc2.c
+8. Code Generation
+    - VEX/priv/host_amd64_defs.c
+
+reference: http://publicclu2.blogspot.tw/2013/05/notes-on-valgrind.html

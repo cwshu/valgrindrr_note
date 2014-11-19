@@ -1,0 +1,31 @@
+VG_(translate)
+--------------
+VG_(translate)
+    - use nraddr to find (addr, kind). (find the address is redirection or not)
+        - nraddr is ip(instruction pointer) from VG_(get_IP)()
+    - find new segment ?
+    - Figure out which preamble-mangling callback to send
+        - preamble_fn
+    - Get the CPU info
+    - Set up 'abiinfo' structure
+
+    - Set up args for LibVEX_Translate
+        - arch_info(CPU info), abiinfo
+        - Set up closure args
+        - guest_bytes: addr
+        - host_bytes
+        - guest_extents
+
+        - instrument1, instrument2, finaltidy
+        - preamble_fn
+        - ... etc
+    - translation
+    - add translated block to tt/tc or unredir tt/tc.
+
+- nraddr
+    - kind
+        - NO_REDIR: addr = nraddr
+
+        - NORMAL: addr = nraddr
+        - REDIR_WRAP: addr = VG_(redir_do_lookup)( nraddr, &isWrap )
+        - REDIR_REPLACE: addr = VG_(redir_do_lookup)( nraddr, &isWrap )

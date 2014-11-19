@@ -1,0 +1,19 @@
+- IRSB: IR super block
+    - IRStmt: one IR instruction, with *side-effect*
+    - IRExpr: one IR instruction, without *side-effect*
+        - note: valgrind 有自己定義 IR side-effect 的意思
+
+- IRStmt/IRExpr
+    - tag: 定義 Stmt/Expr 的種類
+    - Ist union: 裝 IR 的內容
+
+    - 每種 IRStmt 有自己的 constructor
+
+
+- IRStmtTag: type of IRStmt 
+    - Ist_IMark: 紀錄對應到的 origin machine instruction
+    - Ist_Exit
+        - IRJumpKind
+            - Ijk_Sys_int128 (int 0x80)
+
+- IRExprTag: type of IRStmt 

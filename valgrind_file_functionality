@@ -1,0 +1,58 @@
+coregrind
+---------
+- coregrind/m_syscall.c: 
+    - VG_(mk_SysRes) (constructor of syscall result)
+    - do_syscall_WRK
+    - VG_(do_syscall) (doing syscall, callgrind use it call gettimeoftheday)
+    - VG_(strerror)
+
+- coregrind/m_syswrap/syswrap_main.c
+    - do_syscall_client
+    - ML_(do_syscall_client_WRK)
+    - convert_SysRet_to_SysCallStatus
+    - getSyscallArgsFromGuestState
+    - getSyscallStatusFromGuestState
+    - putSyscallArgsIntoGuestState
+    - putSyscallStatusIntoGuestState
+    - getSyscallArgLayout
+    - bad_before
+    - get_syscall_entry
+        - ML_(get_linux_syscall_entry)
+    - VG_(client_syscall)
+    - VG_(post_syscall)
+    - ML_(fixup_guest_state_to_restart_syscall)
+        - Back up guest state to restart a system call.
+
+- coregrind/m_syswrap/priv_types_n_macros
+    - 定義大量 system call 相關 macro/structures (SysArg ... etc)
+
+- coregrind/m_translate
+    - vta.instrument1 = VG_(tdict).tool_instrument; (with 強制轉型)
+    - vta.instrument2 = need_to_handle_SP_assignment ? vg_SP_update_pass : NULL
+
+- coregrind/m_redir.c
+    - 檢查 Basic Block start address 是否有 redirection
+- coregrind/m_oset.c
+    - OSet struct, AvlTree
+- coregrind/m_mallocfree.c
+    - Basicblock, block 相關資料結構的定義
+    - arena_malloc
+ 
+- coregrind/m_libc_*
+    - valgrind 版的 glibc implementation, 以及一些 process-related 的 system call wrapper.
+    - m_libcprint
+        - VG_(message)
+- coregrind/m_debuglog.c
+    - VG_(debugLog_vprintf) used by VG_(message)
+- coregrind/m_oset.c
+    - container order set, implement by AVL tree
+    - redir_do_lookup maintained by oset activeSet.
+
+Macro
+~~~~~
+RECORDREPLAY(sys_gettimeofday)
+=> vgSysWrap_generic_sys_gettimeofday_record_replay (ThreadId tid, ULong* sys_ret, SyscallArgs* arrghs);
+- SYSNO => arrghs->sysno
+- ARG1 => arrghs->arg1
+
+DECL_TEMPLATE(auxstr, name)

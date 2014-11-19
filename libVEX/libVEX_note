@@ -1,0 +1,6 @@
+LibVEX
+------
+- VEX/pub/libvex.h:
+    - VexTranslateArgs, VexTranslateResult, VexGuestExtents.
+- VEX/pub/libvex_ir.h: define VEX IR
+- VEX/priv/ir_def.c: addIRtoIRSB, IRStmt constructors ... etc.

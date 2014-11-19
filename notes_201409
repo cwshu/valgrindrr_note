@@ -1,0 +1,162 @@
+valgrindrr
+    - /tmp/logrr
+    - /proc/9830/maps
+
+open client
+-----------
+struct _IICreateImageInfo at pub_core_initimg.h;
+    - toolname
+    - sp_at_startup, clstack_top.
+    - argv, envp
+
+struct _IIFinalizeImageInfo at pub_core_initimg.h;
+
+valgrind_main (argc=3, argv=0xbffff614, envp=0xbffff624) 
+    - vgPlain_ii_create_image() called at m_main.c:1896
+        - open client executable
+        - setup client stack and data segment (max stack/data-seg size.)
+
+full stack
+++++++++++
+valgrind_main (argc=3, argv=0xbffff614, envp=0xbffff624) 
+    vgPlain_ii_create_image (iicii=...) called at m_main.c:1896
+        load_client (info=0x392c0690, client_ip=0x392c0684, client_toc=0x392c0688) called at m_initimg/initimg-linux.c:890
+            vgPlain_do_exec (exe_name=0x38c980c0 "rr_testcode/std_input", info=0x392c0690) called at m_initimg/initimg-linux.c:91
+                vgPlain_do_exec_inner (exe=0x38c980c0 "rr_testcode/std_input", info=0x392c0690 ) called at m_ume/main.c:280
+                    vgPlain_pre_exec_check (exe_name=0x38c980c0 "rr_testcode/std_input", out_fd=0x392c0600, allow_setuid=0 '\000') called at m_ume/main.c:143
+                        vgPlain_open (pathname=0x38c980c0 "rr_testcode/std_input", flags=0, mode=0) called at m_ume/main.c:77
+
+Misc
+++++
+- module umc means user-mode exec
+
+
+main workflow of translation
+----------------------------
+objects
++++++++
+enum threadStatus
+    - thread 在 scheduler 的狀態. ex. runnable, waiting syscall, or temporary yielding ... etc.
+
+struct threadState
+    - tid, thread_name, threadStatus, exitCode
+    - threadArchState (architecture-specific state), threadOSstate (OS-specific state)
+    - sig_mask, tmp_sig_mask, sig_queue, altstack (alternate signal stack)
+    - client_stack_szB (client stack size), client_highest_word
+    - [RR] dispatch_ctr
+
+global var
+    - struct threadState[VG_N_THREADS] VG_(threads)
+
+- tranlation table/cache (module transtab)
+    - TTEntry
+    - Sector
+
+important functon
+-----------------
+VG_(scheduler)
+    - while( !VG_(is_exiting)(tid) ) (m_scheduler.c:1261 ~ 1607)
+        - run_thread_for_a_while( &trc, ... )
+        - according to trc[0]: (if && switch)
+            - handle_noredir_jump
+            - handle_tt_miss
+            - handle_chain_me
+            - do_client_request
+            - handle_syscall
+            - trc[0] == VG_TRC_INNER_COUNTERZERO, dispatch_ctr == 0,
+                - Timeslice is out. Let a new thread be scheduled
+
+handle_tt_miss
+    - if VG_(search_transtab)
+    - [false] VG_(translate)
+        - VG_(add_to_transtab) called at coregrind/m_translate.c:1651
+
+run_thread_for_a_while
+----------------------
+- not TT_FAST_HASH & not VG_(search_transtab)
+    - two_word = VG_TRC_INNER_FASTMISS
+- VG_(disp_run_translations)
+    - change two_word
+
+Return Code of Translation
+++++++++++++++++++++++++++
+VG_TRC_* & VEX_TRC_*
+
+the return value is from
+    1. run_thread_for_a_while
+    2. VG_(disp_run_translations)
+
+- VG_TRC_BORING             
+- VEX_TRC_JMP_BORING      
+    - do nothing
+
+- VG_TRC_INNER_FASTMISS     
+    - handle_tt_miss
+
+- VG_TRC_CHAIN_ME_TO_SLOW_EP
+- VG_TRC_CHAIN_ME_TO_FAST_EP
+    - handle_chain_me
+
+- VEX_TRC_JMP_NOREDIR   
+    - handle_noredir_jump
+
+- VEX_TRC_JMP_SYS_SYSCALL 
+- VEX_TRC_JMP_SYS_INT32   
+- VEX_TRC_JMP_SYS_INT128  
+- VEX_TRC_JMP_SYS_INT129  
+- VEX_TRC_JMP_SYS_INT130  
+- VEX_TRC_JMP_SYS_SYSENTER
+    - handle_syscall
+
+- VEX_TRC_JMP_CLIENTREQ  
+    - do_client_request
+
+- VG_TRC_INNER_COUNTERZERO  
+    - dispatch_ctr == 0
+
+- VEX_TRC_JMP_YIELD      
+    - explicit yield
+    - if dispatch_ctr > 1000: dispatch_ctr = 1000
+
+- VG_TRC_FAULT_SIGNAL       
+- VEX_TRC_JMP_SIGTRAP   
+- VEX_TRC_JMP_SIGSEGV   
+- VEX_TRC_JMP_SIGBUS    
+- VEX_TRC_JMP_SIGFPE_INTDIV 
+- VEX_TRC_JMP_SIGFPE_INTOVF 
+
+- VEX_TRC_JMP_MAPFAIL    
+    - VG_(synth_fault)
+
+- VEX_TRC_JMP_NODECODE   
+    - valgrind: Unrecognised instruction
+
+- VG_TRC_INVARIANT_FAILED   
+    - bug in VEX codegen
+
+- VEX_TRC_JMP_TINVAL    
+    - invalid translation
+
+- VEX_TRC_JMP_EMWARN     
+- VEX_TRC_JMP_EMFAIL     
+
+SCHEDSETJMP
++++++++++++
+SCHEDSETJMP(tid, jumped, stmt)
+do {
+    ThreadState * volatile _qq_tst = VG_(get_ThreadState)(tid);
+    (jumped) = VG_MINIMAL_SETJMP(_qq_tst->sched_jmpbuf);              
+
+    if ((jumped) == ((UWord)0)) {                                     
+        vg_assert(!_qq_tst->sched_jmpbuf_valid);
+        _qq_tst->sched_jmpbuf_valid = True;
+        stmt;
+    }
+    else if (VG_(clo_trace_sched))
+        VG_(printf)("SCHEDSETJMP(line %d) tid %d, jumped=%ldn", __LINE__, tid, jumped);                            
+
+    vg_assert(_qq_tst->sched_jmpbuf_valid);
+    _qq_tst->sched_jmpbuf_valid = False;
+} while(0)
+
+stmt = VG_(disp_run_translations)(two_words, (void*)&tst->arch.vex, host_code_addr)

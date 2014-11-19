@@ -1,0 +1,21 @@
+Main Calling Order in valgrind_main()
+-------------------------------------
+- valgrind_main in coregrind/m_main.c
+    - initialization (1), (2)
+
+- VG_(main_thread_wrapper_NORETURN) in coregrind/m_syswrap/syswrap-linux.c
+
+- ML_(call_on_new_stack_0_1) in coregrind/m_syswrap/syswrap-amd64-linux.c
+    - inline assembly
+    - jump to f -> run_a_thread_NORETURN
+
+- run_a_thread_NORETURN in coregrind/m_syswrap/syswrap-linux.c
+    - thread_wrapper in coregrind/m_syswrap/syswrap-linux.c
+        - VG_(scheduler)
+            - handle_* calling VG_(translate).
+                - handle_tt_miss, handle_chain_me, handle_noredir_jump
+                - not include handle_syscall
+
+- VG_(address_of_m_main_shutdown_actions_NORETURN) = shutdown_actions_NORETURN // function pointer
+    - shutdown_actions_NORETURN in m_main.c
+        - 後半段執行 finalization

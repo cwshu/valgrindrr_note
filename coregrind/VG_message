@@ -1,0 +1,17 @@
+VG_(message)() will print string to OutputSink(output fd) with prefix like "==pid=="
+
+3 kinds(VgMsgKind) of message with different prefix notation to replace '=' notation in "==pid=="
+    - Vg_UserMsg: =
+    - Vg_DebugMsg: -
+    - Vg_ClientMsg: *
+    - others: ?
+
+use VG_(debugLog_vprintf) in m_debuglog
+    
+example::
+
+    ==7685== Counted 0 calls to main()
+    ==7685== 
+    ==7685== Jccs:
+    ==7685==   total:         263,164
+    ==7685==   taken:         128,619 ( 48%)

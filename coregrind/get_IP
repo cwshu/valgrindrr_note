@@ -1,0 +1,8 @@
+- VG_(get_IP)()
+    - get instruction pointer of thread 
+    - from global array of ThreadState: VG_(threads)
+    - VG_(threads)[tid].arch.vex.VG_INSTR_PTR
+
+- VG_INSTR_PTR is guest_EIP in x86 (coregrind/pub_core_machine.h)
+- ThreadState, ThreadArchState, VexGuestArchState, VexGuestX86State (coregrind/pub_core_threadstate.h)
+- VexGuestX86State is almost consist of x86 registers (VEX/pub/libvex_quest_x86.h)

@@ -1,0 +1,5 @@
+struct VgToolInterface VG_(tdict);
+
+VgToolInterface 為一堆 function pointer member 的 structure.
+這些 member 最後指向從 tool link 進來的對應 function.
+coregrind 中要使用 tool 的 function, 全部透過一個 global 的 VgToolInterface 變數 VG_(tdict).
