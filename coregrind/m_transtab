@@ -24,4 +24,24 @@ header file
 
 c source
 --------
-TTEntry
+- struct
+    - InEdge/OutEdge(and Arr ver): created by chaining
+    - TTEntry
+    - HostExtent
+    - Sector
+
+    - UTCEntry: Unredir TC
+        - unredir translation table 為 UTCEntry 的 array
+
+
+- TTEntry
+    - count/weight: for profiling
+    - status
+    - tcptr: point to host code(translation code)
+    - VexGuestExtents vge
+    - eclass related
+
+- UTCEntry
+    - VexGuestExtents: 原 address
+    - Addr hcode: 指向 instrumented code
+    - Bool InUse

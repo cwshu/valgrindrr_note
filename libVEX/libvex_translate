@@ -5,7 +5,7 @@ VexTranslateResult LibVEX_Translate(VexTranslateArgs*);
 function-related structure
 --------------------------
 - struct VexTranslateArgs
-    - struct VexGuestExtents (OUT: which bits of guest code actually got translated)
+    - struct VexGuestExtents (output argument: which bits of guest code actually got translated)
         - base(Addr) + len + n_used
 
     - dispatcher entry points 
