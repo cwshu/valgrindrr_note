@@ -1,0 +1,9 @@
+- CLO
+    - 開啟功能
+    - 指定 open/close 檔名
+
+- issue
+    - 最後一次 close
+    - 指定 open/close 檔名 (str_clo)
+    - 檔名相同的判斷 (ex. 有無加 "./", 相對/絕對路徑)
+

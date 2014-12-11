@@ -1,0 +1,27 @@
+- CLG_(set_instrument_state) <on|off>
+    - 效果: global variable CLG_(instrument_state) = <true|false>
+    - 如何影響 callgrind: CLG_(instrument_state) check CLG_(instrument_state), if false, return sbIn
+
+- toggle_collect
+    - 效果: CLG_(current_state).collect = !CLG_(current_state).collect
+    - 如何影響 callgrind: many function will do nothing but return if !CLG_(current_state).collect
+
+clo.c for command line option
+-----------------------------
+fn_config: configuration of function
+config node: use trie structure
+
+trace fn->toggle (toggle-collect or collect-start)
+++++++++++++++++++++++++++++++++++++++++++++++++++
+in function_enter in callstack.c
+in CLG_(push_call_stack) in callstack.c
+in CLG_(setup_bbcc) in bbcc.c
+    - used every superblock
+
+callgrind statistic data
+------------------------
+CLG_(stat)
+
+debug
+-----
+CLG_DEBUG (global.h)

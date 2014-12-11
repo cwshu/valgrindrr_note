@@ -1,0 +1,31 @@
+init_dump() 開啟 callgrind.out.%p
+
+使用 syscall level 的 open 跟 file descriptor 寫檔.
+
+dump 應該是 finalization 才做的
+callstack::
+
+    CLG_(fini)()
+    finish()
+    vgCallgrind_dump_profile()
+    print_bbccs()
+    print_bbccs_of_thread()
+    new_dumpfile()
+ 
+
+- dump 中跟 stat 有關的 function
+    - new_dumpfile
+    - CLG_(dump_profile)
+    - init_dump_array
+
+- global variables
+    - CLG_(clo).out_format
+        - CLO 輸入的檔名, 可含 %p 這種 format
+    - out_file
+    - out_directory
+    - filename = out_file
+
+Misc
+----
+    - vgCallgrind_dump_profile()
+        - CLG_(init_dumps)()
