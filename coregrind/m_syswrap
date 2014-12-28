@@ -1,5 +1,9 @@
-coregrind/m_syswrap
-+++++++++++++++++++
+valgrind process 2 kind of system call.
+1. valgrind core's syscall
+2. valgrind client(debugged program)'s syscall
+
+files in coregrind/m_syswrap/
++++++++++++++++++++++++++++++
 - syswrap-main.c
 - syswrap-generic.c (with RR version)
     - 定義各 PRE(sys_<syscall_name>) and POST()
@@ -17,3 +21,9 @@ coregrind/m_syswrap
 - syscall-<cpu>-<OS>.S
     - ML_(do_syscall_for_client_WRK)
 
+
+syscall routine
++++++++++++++++
+VG_(client_syscall) => do_syscall_for_client => ML_(do_syscall_for_client_WRK)
+
+ML_(do_syscall_for_client_WRK) is an assembly code which does system call (push/pop args ...) for specific platform.

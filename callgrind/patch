@@ -1,9 +1,15 @@
-- CLO
-    - 開啟功能
-    - 指定 open/close 檔名
+- command line option 提供
+    - 開啟 coc patch
+    - 指定 coc 的 open/close 檔名
 
 - issue
     - 最後一次 close
+        - many closing in array.
+        - copy and move back.
+    - 檔名相同的判斷 
+        - non-prefix .. and .
+        - 相對/絕對路徑
+        - soft and hard link
+    - java testcase
+    - more testcases
     - 指定 open/close 檔名 (str_clo)
-    - 檔名相同的判斷 (ex. 有無加 "./", 相對/絕對路徑)
-

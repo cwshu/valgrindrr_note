@@ -1,0 +1,35 @@
+file header::
+    
+    /*--------------------------------------------------------------------*/
+    /*--- Callgrind                                                    ---*/
+    /*---                                                       main.c ---*/
+    /*--------------------------------------------------------------------*/
+
+license::
+
+    /*
+       This file is part of Callgrind, a Valgrind tool for call graph
+       profiling programs.
+
+       Copyright (C) 2002-2013, Josef Weidendorfer (Josef.Weidendorfer@gmx.de)
+
+       ...
+
+       The GNU General Public License is contained in the file COPYING.
+    */
+
+file header comment::
+
+
+every section in file::
+
+    /*------------------------------------------------------------*/
+    /*--- Global variables                                     ---*/
+    /*------------------------------------------------------------*/
+
+subsection::
+
+    /* for all threads */
+    /* thread and signal handler specific */
+    /* min of L1 and LL cache line sizes.  This only gets set to a
+       non-zero value if we are doing cache simulation. */
