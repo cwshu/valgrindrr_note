@@ -1,6 +1,6 @@
 CLG_(set_instrument_state) <on|off>
     - 效果: global variable CLG_(instrument_state) = <true|false>
-    - 如何影響 callgrind: CLG_(instrument_state) check CLG_(instrument_state), if false, return sbIn
+    - 如何影響 callgrind: CLG_(instrument) check CLG_(instrument_state), if false, return sbIn
 
 - 初始化
     - default: true

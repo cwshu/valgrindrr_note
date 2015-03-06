@@ -1,0 +1,66 @@
+functions
+---------
+- fwrite_flush()
+  
+  - 把全域變數 fwrite_buf 真正寫入檔案
+
+- my_fwrite()
+
+  - 如果 buffer 夠大, 把資料先寫入 fwrite_buf, 不然則如同 fwrite_flush 直接寫入檔案.
+
+- dump.c
+  - data
+    - AddrCost ccSum[2] (Cost Summation?)
+    - int currSum
+
+  - copy_apos
+  - fprint_apos
+  - fprint_pos
+  - fprint_cost (print event)
+  - fprint_fcost
+    - call fprint_pos/fprint_cost/copy_apos
+  - fprint_jcc
+
+  - fprint_bbcc
+
+  - my_cmp
+  - qsort 系列
+    - swap, swapFunc
+    - med3
+    - qsort
+    - BBCC** qsort_start
+
+  - BBCC** prepare_dump(): Put all BBCCs with costs into a sorted array, The returned arrays ends with a null pointer.
+    - data
+        - Int    prepare_count
+        - BBCC** prepare_ptr
+    - sub_functions
+      - hash_addCount(bbcc): prepare_count++
+      - hash_addPtr(bbcc): *prepare_ptr = bbcc, prepare_ptr++ (like: prepare_ptr[i] = bbcc, i++)
+      
+      - cs_addCount(thread_info*)
+      - cs_addPtr(thread_info*)
+    - doing
+      - allocate: CLG_MALLOC
+      - insert: hash_addPtr
+      - sort: qsort
+
+
+
+Data
+----
+- fwrite_buf, fwrite_pos, fwrite_fd
+- CLG_(sets) (event_set)
+
+bbcc.c
+------
+- global var
+  - bbcc_hash current_bbccs
+
+- CLG_(forall_bbccs)
+
+  - current_bbccs.table[i]
+  - for i in [bbcc, bbcc->next, ... ]
+    - for j in [?]
+      - func(bbcc->rec_array[j])
+

@@ -6,10 +6,13 @@
     - 最後一次 close
         - many closing in array.
         - copy and move back.
-    - 檔名相同的判斷 
-        - non-prefix .. and .
-        - 相對/絕對路徑
-        - soft and hard link
     - java testcase
     - more testcases
+        - TA's standard answer test.
     - 指定 open/close 檔名 (str_clo)
+
+    - close 完再開 input.txt
+    - hotfix/dup
+        - test dup/dup2
+        - other dup-like method (ex. fcntl)
+        - open/close error handling

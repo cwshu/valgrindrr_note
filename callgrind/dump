@@ -1,17 +1,24 @@
-init_dump() 開啟 callgrind.out.%p
+- close_dumpfile() 一次寫入檔案
 
-使用 syscall level 的 open 跟 file descriptor 寫檔.
+- print_bbccs_of_thread() in dump.c
+    - 1517: new_dumpfile()
+    - prepare_dump()
+    - 1527 ~ 1580: while loop, real print message to callgrind.out.%p
+    - 1582: close_dumpfile()
 
-dump 應該是 finalization 才做的
-callstack::
+1. statistic profiling data at CLG_(stat). (type Statistic)
+2. init_dump() 開啟 callgrind.out.%p
+3. 使用 syscall level 的 open 跟 file descriptor 寫檔.
+4. dump 應該是 finalization 才做的
 
-    CLG_(fini)()
-    finish()
-    vgCallgrind_dump_profile()
-    print_bbccs()
-    print_bbccs_of_thread()
-    new_dumpfile()
- 
+    callstack::
+
+        CLG_(fini)()
+        finish()
+        CLG_(dump_profile)()
+        print_bbccs()
+        print_bbccs_of_thread()
+        new_dumpfile()
 
 - dump 中跟 stat 有關的 function
     - new_dumpfile
@@ -24,6 +31,21 @@ callstack::
     - out_file
     - out_directory
     - filename = out_file
+
+functions
+---------
+- fwrite_flush()
+  
+  - 把全域變數 fwrite_buf 真正寫入檔案
+
+- my_fwrite()
+
+  - 如果 buffer 夠大, 把資料先寫入 fwrite_buf, 不然則如同 fwrite_flush 直接寫入檔案.
+
+Data
+----
+- fwrite_buf, fwrite_pos, fwrite_fd
+- CLG_(sets) (event_set)
 
 Misc
 ----
